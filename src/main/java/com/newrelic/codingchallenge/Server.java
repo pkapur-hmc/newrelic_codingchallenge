@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.impl.Log4JLogger;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +24,8 @@ public class Server {
     private ExecutorService pool; // Executor that tracks all connected clients, limits to 5
     private List<Socket> listOfClients; // Thread safe list of all connected clients
     private Log logger = LogFactory.getLog("numbers.log");
+    ServerSocket serverSocket;
+    private boolean keepServer = true;
 
     /*
     Default constructor for object of type Server
@@ -43,7 +46,7 @@ public class Server {
     Run() method for server type
      */
     public void runServer() throws IOException {
-        ServerSocket serverSocket = new ServerSocket(4000); // Create new server socket on port 4000
+        this.serverSocket = new ServerSocket(4000); // Create new server socket on port 4000
         System.out.println("Server is running");
 
         // Outputted message every 10s providing information on number of unique and repeated numbers
@@ -61,7 +64,8 @@ public class Server {
         timer.scheduleAtFixedRate(task, delay, interval);
 
         try {
-            while (true) { // Accept up to 5 concurrent clients
+            while (keepServer) { // Accept up to 5 concurrent clients
+                System.out.println("still in loop");
                 Socket socket = serverSocket.accept();
                 numClients.incrementAndGet();
                 ThreadedServer serverThread = new ThreadedServer(socket, numClients, this);
@@ -69,11 +73,17 @@ public class Server {
                 listOfClients.add(socket);
 
             }
-        } finally {
+        }
+        catch (SocketException e){
+            keepServer = false;
+            task.cancel();
+            System.exit(0);
+        }
+        finally {
             serverSocket.close();
         }
-    }
 
+    }
 
     /*
     Shutdown all clients
@@ -85,6 +95,7 @@ public class Server {
             socket.shutdownInput();
             socket.shutdownOutput();
         }
+        serverSocket.close();
     }
 
     /*

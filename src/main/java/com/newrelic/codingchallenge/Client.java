@@ -10,7 +10,7 @@ public class Client {
     /*
     main method for Client class that initializes the client and communicates with the server
      */
-    public static void main(String args[]) throws Exception {
+    public static void main() throws Exception {
 
         Socket socket = new Socket("localhost", 4000); // Create new socket on localhost and port 4000
         BufferedReader serverIn = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Input stream from server
@@ -42,4 +42,5 @@ public class Client {
 
 
     }
+
 }
