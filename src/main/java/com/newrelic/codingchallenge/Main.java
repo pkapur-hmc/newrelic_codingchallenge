@@ -10,10 +10,10 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        try {
+        try { // Create a client
             Client.main();
         }
-        catch (ConnectException e)
+        catch (ConnectException e) // Server has not been set up yet, so set it up
         {
             System.out.println("Starting up server ....");
             Server server = new Server();
