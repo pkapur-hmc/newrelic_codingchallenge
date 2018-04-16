@@ -1,8 +1,6 @@
 package com.newrelic.codingchallenge;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class DisplayedInfo {
     private AtomicInteger totalUnique; // Thread-safe total number of unique numbers
